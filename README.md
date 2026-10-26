@@ -27,8 +27,7 @@ This project implements a red-black tree in Java. A red-black tree is a self-bal
 - `Node.java` — Represents an individual tree node, including its value, color, and links to its parent and children.
 - Other application files — Provide the JavaFX interface and supporting functionality.
 
-## Technologies
+## Testing
 
-- Java
-- JavaFX
-- Red-black tree data structure
+We tested based on the final tree given by the professor in the document describing the assignment, which ended up being identical. We also tested a different insertion sequence using our program and an online Red-Black tree to see whether the results matched, and they did.
+
