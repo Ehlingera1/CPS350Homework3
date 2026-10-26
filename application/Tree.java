@@ -21,52 +21,119 @@ public class Tree {
 	 * If the node to be inserted has the value already exist in the tree, it should not be inserted and return "false". So you need to modify the code to forbid 
 	 * nodes with repeating values to be inserted. 
 	 */
-	public boolean insertNode(Node node) {
-		
-		//Here is just an example of setting colors for a node. So far, it is in green color. But you need to modify the code to dynamically adjust the color to
-		//either RED or BLACK according to the red-black logic 
-		node.setColor(Node.BLACK);
-		
-		// if the root exists
-		if (root == null) {
-			root = node; // let the root point to the current node
-		} else {
-			Node current_node = root;
-			while (current_node != null) {
-				int value = current_node.getValue();
-				if (node.getValue() == value) {
-					return false;
-				}
-				if (node.getValue() < value) // go to the left sub-tree
-				{
-					if (current_node.getLeft() != null) // if the left node is
-														// not empty
-					{
-						current_node = current_node.getLeft();
-					} else // put node as the left child of current_node
-					{
-						current_node.setLeft(node);
-						current_node = null;
-					}
-				} else // go to the right
-				{
-					if (current_node.getRight() != null) // if the right node is
-															// not empty
-					{
-						current_node = current_node.getRight();
-					} else // put node as the right child of current_node
-					{
-						current_node.setRight(node);
-						current_node = null;
-					}
+	private boolean isRed(Node node) {
+		if (node == null) {
+			return false;
+		}
+		return node.isRed();
+	}
 
-				}
+	/**
+	 * Left rotation for Red-Black Tree balancing.
+	 */
+	private Node rotateLeft(Node h) {
+		Node x = h.getRight();
+		h.setRight(x.getLeft());
+		x.setLeft(h);
+
+		x.setColor(h.getColor());
+		h.setColor(Node.RED);
+		return x;
+	}
+
+	/**
+	 * Right rotation for Red-Black Tree balancing.
+	 */
+	private Node rotateRight(Node h) {
+		Node x = h.getLeft();
+		h.setLeft(x.getRight());
+		x.setRight(h);
+
+		x.setColor(h.getColor());
+		h.setColor(Node.RED);
+		return x;
+	}
+
+	/**
+	 * Flip colors of node h and its two children.
+	 */
+	private void flipColors(Node h) {
+		h.setColor(Node.RED);
+		if (h.getLeft() != null) {
+			h.getLeft().setColor(Node.BLACK);
+		}
+		if (h.getRight() != null) {
+			h.getRight().setColor(Node.BLACK);
+		}
+	}
+
+	/**
+	 * Recursive Red-Black Tree insertion.
+	 */
+	private Node insert(Node h, Node node) {
+		if (h == null) {
+			node.setColor(Node.RED);
+			return node;
+		}
+
+		// BST insertion logic
+		if (node.getValue() < h.getValue()) {
+			h.setLeft(insert(h.getLeft(), node));
+		} else if (node.getValue() > h.getValue()) {
+			h.setRight(insert(h.getRight(), node));
+		} else {
+			return h; // Value already exists
+		}
+
+		// Fix-up Red-Black Tree violations
+		if (isRed(h.getRight()) && !isRed(h.getLeft())) {
+			h = rotateLeft(h);
+		}
+		if (isRed(h.getLeft()) && isRed(h.getLeft().getLeft())) {
+			h = rotateRight(h);
+		}
+		if (isRed(h.getLeft()) && isRed(h.getRight())) {
+			flipColors(h);
+		}
+
+		return h;
+	}
+
+	/**
+	 * Duplicate check helper.
+	 */
+	private boolean contains(Node current, int value) {
+		while (current != null) {
+			if (value == current.getValue()) {
+				return true;
+			} else if (value < current.getValue()) {
+				current = current.getLeft();
+			} else {
+				current = current.getRight();
 			}
+		}
+		return false;
+	}
+
+	/**
+	 * Main entry point for inserting a node.
+	 */
+	public boolean insertNode(Node node) {
+		// 1. Reject duplicates
+		if (contains(getRoot(), node.getValue())) {
+			return false;
+		}
+
+		// 2. Perform recursive Red-Black insertion
+		setRoot(insert(getRoot(), node));
+
+		// 3. Ensure root is always BLACK
+		if (getRoot() != null) {
+			getRoot().setColor(Node.BLACK);
 		}
 
 		return true;
 	}
-
 	
 
 	
